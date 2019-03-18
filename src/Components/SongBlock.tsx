@@ -3,6 +3,7 @@ import Song from "../Interfaces/Song";
 
 const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
     
+    console.log(song);
     
     if (song === undefined) {
     return <div></div>;
