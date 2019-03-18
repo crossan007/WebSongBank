@@ -1,0 +1,42 @@
+.App {
+  width: 100%;
+}
+
+.App h1 {
+  text-align:  center;
+}
+
+.CurrentSongDisplay {
+  vertical-align: top;
+  
+}
+
+.CurrentSongDisplay div {
+  vertical-align: top;
+}
+
+.SongBankListDisplay {
+  vertical-align: top;
+  height: 60vh
+}
+
+.SongSetListDisplay {
+  height: 30vh;
+}
+
+.LeftSideBar {
+  border-top: 1px solid black;
+  border-right: 1px solid black;
+  float: left;
+  width: 30%; 
+  height: 100vh;
+}
+
+
+.RightSideBar {
+  border-top: 1px solid black;
+  float: left;
+  margin-left: 5px;
+  padding-left: 5px;
+  width: auto;
+}
