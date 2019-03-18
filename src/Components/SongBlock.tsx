@@ -1,23 +1,5 @@
 import React, { Component } from 'react';
-
-interface Song {
-    Title: string,
-    Authors: string[],
-    CCLINumber: string,
-    SongKeys: SongKey[],
-    Links: Link[]
-}
-
-interface SongKey {
-    PreferredBy: string[],
-    Key: string,
-    Links: Link[]
-}
-
-interface Link {
-    URL: string,
-    Title: string
-}
+import Song from "../Interfaces/Song";
 
 const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
     
