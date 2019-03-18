@@ -11,7 +11,7 @@ const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
     const displayStyle = {display: 'inline-block'};
     const singleSong = (
     <div>
-        <h3 key={song.Title}>{song.Title}</h3>
+        <h2 key={song.Title}>{song.Title}</h2>
         <div style={displayStyle}>
         <p>CCLI: {song.CCLINumber}</p>
         <p>Links:</p>
@@ -47,9 +47,7 @@ const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
     </div>
     );
 
-    return (
-    <div>{singleSong}</div>
-    );
+    return singleSong;
 }
 
 

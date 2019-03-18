@@ -11,9 +11,7 @@ function  Child( match: RouteComponentProps ) {
   let mparams = match.match.params as any;
   console.log(mparams["id"]);
   return (
-    <div>
      <SongBlock song={songs[mparams["id"]]} />
-    </div>
   );
 }
 
@@ -24,13 +22,15 @@ class App extends Component {
     return (
       <Router>
         <div className="App">
-          <h1>Song Bank</h1>
+          <div className="Header">
+            <h1>Song Bank</h1>
+          </div>
           <div className="LeftSideBar">
-            <div className="SongSetListDisplay">
+            <div className="SongSetListDisplay box">
               <h2>Song Set</h2>
             
             </div>
-            <div className="SongBankListDisplay">
+            <div className="SongBankListDisplay box">
               <h2>Song Bank List</h2>
               <ul>
                 {songs.map((song,  idx) =>
@@ -42,7 +42,7 @@ class App extends Component {
             </div>
           </div>
           <div className="RightSideBar">
-            <div className ="CurrentSongDisplay">
+            <div className ="CurrentSongDisplay box">
               <Route path="/:id" component={Child} />
             </div>
           </div>

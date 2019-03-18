@@ -1,8 +1,12 @@
 .App {
-  width: 100%;
+  display: grid;
+  grid-template-columns: [left] 30vw [right] auto;
+  grid-template-rows: [header] 100px [content] auto;
 }
 
-.App h1 {
+.Header {
+  grid-row: header;
+  grid-column: left / span 2;
   text-align:  center;
 }
 
@@ -25,18 +29,20 @@
 }
 
 .LeftSideBar {
-  border-top: 1px solid black;
-  border-right: 1px solid black;
-  float: left;
-  width: 30%; 
-  height: 100vh;
+  grid-column:left
 }
 
 
 .RightSideBar {
-  border-top: 1px solid black;
-  float: left;
-  margin-left: 5px;
-  padding-left: 5px;
-  width: auto;
+  grid-column: right
+}
+
+.box {
+  margin: 5px;
+  border: 1px solid black;
+  padding: 5px;
+}
+
+.box  h1, h2 {
+  margin: 5px
 }
