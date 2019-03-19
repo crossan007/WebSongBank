@@ -34,7 +34,7 @@ class App extends React.Component<WebSongBankProps, WebSongBankState> {
   }
 
   componentDidMount() {
-    fetch('/songs.json')
+    fetch('songs.json')
       .then(response => response.json())
       .then(data => {this.setState({Songs: data})});
   }
@@ -56,7 +56,7 @@ class App extends React.Component<WebSongBankProps, WebSongBankState> {
               <ul>
                 {this.state.Songs.map((song,  idx) =>
                   <li key={idx}>
-                   <Link to={"/"+idx}  >{idx}: {song.Title}</Link>
+                   <Link to={String(idx)}  >{idx}: {song.Title}</Link>
                   </li>
                 )}
               </ul>
@@ -65,7 +65,7 @@ class App extends React.Component<WebSongBankProps, WebSongBankState> {
           <div className="RightSideBar">
             <div className ="CurrentSongDisplay box">
               <Route path="/:id" render={(props)=>{
-                if (this.state.Songs.length >0 ){ 
+                if (this.state.Songs.length >0 && this.state.Songs[props.match.params.id] != undefined){ 
                   return <h1>{this.state.Songs[props.match.params.id].Title}</h1>
                  }
                  else {
