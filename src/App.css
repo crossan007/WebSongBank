@@ -21,7 +21,8 @@
 
 .SongBankListDisplay {
   vertical-align: top;
-  height: 60vh
+  height: 60vh;
+  overflow-y: scroll;
 }
 
 .SongSetListDisplay {
@@ -45,4 +46,13 @@
 
 .box  h1, h2 {
   margin: 5px
+}
+
+ul.nav { 
+  top:0px;
+  text-align: center;
+}
+
+ul.nav li { 
+  display: inline-block;
 }

@@ -5,20 +5,41 @@ import { BrowserRouter as Router, Route, Link, RouteProps, RouteComponentProps }
 import './App.css';
 import './Components/SongBlock';
 import SongBlock from './Components/SongBlock';
-import songs from './songs';
+import Song from './Interfaces/Song';
+import WebSongBankProps from "./Interfaces/WebSongBankProps"
+import SongSetBlock from "./Components/SongSetBlock"
+import WebSongBankState from "./Interfaces/WebSongBankState"
 
-function  Child( match: RouteComponentProps ) {
-  let mparams = match.match.params as any;
-  console.log(mparams["id"]);
-  return (
-     <SongBlock song={songs[mparams["id"]]} />
-  );
-}
+class App extends React.Component<WebSongBankProps, WebSongBankState> {
 
+  constructor(props: WebSongBankProps) {
+    super(props);
 
-class App extends Component {
+    this.state = {
+      Songs: [],
+      SongSets: [
+      {
+        Date: new Date(),
+        Songs:[ 0 , 1],
+        Title: "Test"
+      },
+      {
+        Date: new Date(),
+        Songs:[ 0 , 1],
+        Title: "Test2"
+      }
+    ]
+    }
+
+  }
+
+  componentDidMount() {
+    fetch('/songs.json')
+      .then(response => response.json())
+      .then(data => {this.setState({Songs: data})});
+  }
+
   render() {
-
     return (
       <Router>
         <div className="App">
@@ -27,13 +48,13 @@ class App extends Component {
           </div>
           <div className="LeftSideBar">
             <div className="SongSetListDisplay box">
-              <h2>Song Set</h2>
+              <SongSetBlock SongSets={this.state.SongSets}/>
             
             </div>
             <div className="SongBankListDisplay box">
               <h2>Song Bank List</h2>
               <ul>
-                {songs.map((song,  idx) =>
+                {this.state.Songs.map((song,  idx) =>
                   <li key={idx}>
                    <Link to={"/"+idx}  >{idx}: {song.Title}</Link>
                   </li>
@@ -43,7 +64,14 @@ class App extends Component {
           </div>
           <div className="RightSideBar">
             <div className ="CurrentSongDisplay box">
-              <Route path="/:id" component={Child} />
+              <Route path="/:id" render={(props)=>{
+                if (this.state.Songs.length >0 ){ 
+                  return <h1>{this.state.Songs[props.match.params.id].Title}</h1>
+                 }
+                 else {
+                  return <h1>asdf</h1>
+                 }
+              }}/>
             </div>
           </div>
         </div>
