@@ -25,3 +25,4 @@ yarn-error.log*
 public/songs.json
 db-dump.json
 src/songs.tsx
+scripts/ProdConfig.json

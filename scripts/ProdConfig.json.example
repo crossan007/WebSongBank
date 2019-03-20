@@ -1,0 +1,6 @@
+{
+    "SSHUsername":"USERNAME",
+    "SSHPassword":"password",
+    "SSHHost":"password",
+    "SSHPath":"password"
+}
