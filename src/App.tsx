@@ -39,6 +39,17 @@ class App extends React.Component<WebSongBankProps>{
 
   render() {
     const {Songs, SongSets } = this.props;
+    console.log(this.props);
+    const songList = Songs === undefined || Songs.length === 0 ? (<div/>) : (
+      <ul> {
+        Songs.map((song,  idx) =>
+        <li key={idx}>
+          <Link to={String(idx)}  >{idx}: {song.Title}</Link>
+        </li>
+        )} 
+      </ul>
+    )
+
     return (
       <div className="App">
         <div className="Header">
@@ -51,14 +62,7 @@ class App extends React.Component<WebSongBankProps>{
           </div>
           <div className="SongBankListDisplay box">
             <h2>Song Bank List</h2>
-            <ul>
-              {
-                Songs.map((song,  idx) =>
-                <li key={idx}>
-                  <Link to={String(idx)}  >{idx}: {song.Title}</Link>
-                </li>
-              )}
-            </ul>
+              { songList }
           </div>
         </div>
         <div className="RightSideBar">

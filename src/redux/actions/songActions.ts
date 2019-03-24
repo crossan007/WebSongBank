@@ -3,17 +3,16 @@ import * as songApi from "../../api/songApi";
 import { Dispatch } from "redux";
 import Song from "../../Interfaces/Song";
 
-export function loadSongsSuccess(songs:Song[]) {
-  return { type: types.LOAD_SONGS_SUCCESS, songs };
+export function loadSongsSuccess(Songs:Song[]) {
+  return { type: types.LOAD_SONGS_SUCCESS, Songs };
 }
 
 export function loadSongs() {
   return function(dispatch:Dispatch) {
-    console.log("loading songs(1)");
     return songApi
       .getSongs()
-      .then(songs => {
-        dispatch(loadSongsSuccess(songs));
+      .then(Songs => {
+        dispatch(loadSongsSuccess(Songs));
       })
       .catch(error => {
         throw error;

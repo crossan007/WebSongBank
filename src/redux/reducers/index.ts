@@ -6,13 +6,7 @@ import * as types from "../actions/actionTypes";
 
 
 export const initialState :AppState = {
-  Songs: [{
-    Authors:[],
-    CCLINumber:"asdF",
-    Links:[],
-    SongKeys:[],
-    Title:"asdf"
-  }],
+  Songs: [],
   SongSets: []
 }
 
