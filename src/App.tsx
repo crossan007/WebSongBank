@@ -64,19 +64,18 @@ class App extends React.Component<WebSongBankProps>{
           <h2>Song Bank List</h2>
             { songList }
         </div>
-        
-        <div className="RightSideBar">
-          <div className ="CurrentSongDisplay box">
-            <Route path="/:id" render={(props)=>{
-              if (Songs.length >0 && Songs[props.match.params.id] != undefined){ 
-                return <SongBlock song={Songs[props.match.params.id]} />
-                }
-                else {
-                return <h1>Loading</h1>
-                }
-            }}/>
-          </div>
+
+        <div className ="CurrentSongDisplay box">
+          <Route path="/:id" render={(props)=>{
+            if (Songs.length >0 && Songs[props.match.params.id] != undefined){ 
+              return <SongBlock song={Songs[props.match.params.id]} />
+              }
+              else {
+              return <h1>Loading</h1>
+              }
+          }}/>
         </div>
+
       </div>
     );
   }

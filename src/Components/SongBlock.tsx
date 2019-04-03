@@ -22,14 +22,16 @@ const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
             )}
         </ul>
         </div>
-        <div className="SongKeys">
+        <div className="Verses">
         <h3>Lyrics</h3>
-        {
-            song.Verses.map((Verse) => 
-            <div className="SongKey" >
-                {Verse}
+            <div className="VersesList">
+            {
+                song.Verses.map((Verse) => 
+                <div className="Verse box" >
+                    {Verse}
+                </div>
+                )}
             </div>
-            )}
         </div>
         <div className="SongKeys">
         {

@@ -1,7 +1,7 @@
 .App {
   display: grid;
   grid-template-columns: [left] 30vw [right] auto;
-  grid-template-rows: [header] 100px [selectionList] 25vh [content] auto;
+  grid-template-rows: [header] 100px [selectionList] 25vh [content] min-content;
 }
 
 .Header {
@@ -12,12 +12,14 @@
 
 
 .CurrentSongDisplay {
-
+  grid-column: right;
+  grid-row: selectionList / span 2;
 }
 
 .SongBankListDisplay {
   grid-row: content;
   overflow-y: scroll;
+  max-height: calc(100vh - 150px - 25vh)
 }
 
 .SongSetListDisplay {
@@ -25,7 +27,21 @@
 }
 
 
+.Verses {
 
+}
+.VersesList {
+  overflow-x: scroll;
+  height: 30vh;
+}
+
+.Verse {
+  display:inline-block;
+  width: 20vw;
+  height: 30vh;
+}
+
+ 
 .box {
   margin: 5px;
   border: 1px solid black;
