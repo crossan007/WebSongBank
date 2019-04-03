@@ -6,7 +6,8 @@ interface Song {
     Authors: string[],
     CCLINumber?: string,
     SongKeys?: SongKey[],
-    Links?: SongLink[]
+    Links?: SongLink[],
+    Verses: string[]
 }
 
 export default Song;
