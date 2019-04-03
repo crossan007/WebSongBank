@@ -55,24 +55,24 @@ class App extends React.Component<WebSongBankProps>{
         <div className="Header">
           <h1>Song Bank</h1>
         </div>
-        <div className="LeftSideBar">
-          <div className="SongSetListDisplay box">
-            <SongSetBlock SongSets={SongSets}/>
-          
-          </div>
-          <div className="SongBankListDisplay box">
-            <h2>Song Bank List</h2>
-              { songList }
-          </div>
+       
+        <div className="SongSetListDisplay box">
+          <SongSetBlock SongSets={SongSets}/>
+        
         </div>
+        <div className="SongBankListDisplay box">
+          <h2>Song Bank List</h2>
+            { songList }
+        </div>
+        
         <div className="RightSideBar">
           <div className ="CurrentSongDisplay box">
             <Route path="/:id" render={(props)=>{
               if (Songs.length >0 && Songs[props.match.params.id] != undefined){ 
-                return <h1>{Songs[props.match.params.id].Title}</h1>
+                return <SongBlock song={Songs[props.match.params.id]} />
                 }
                 else {
-                return <h1>asdf</h1>
+                return <h1>Loading</h1>
                 }
             }}/>
           </div>

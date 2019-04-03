@@ -1,7 +1,7 @@
 .App {
   display: grid;
   grid-template-columns: [left] 30vw [right] auto;
-  grid-template-rows: [header] 100px [content] auto;
+  grid-template-rows: [header] 100px [selectionList] 25vh [content] auto;
 }
 
 .Header {
@@ -10,33 +10,21 @@
   text-align:  center;
 }
 
-.CurrentSongDisplay {
-  vertical-align: top;
-  
-}
 
-.CurrentSongDisplay div {
-  vertical-align: top;
+.CurrentSongDisplay {
+
 }
 
 .SongBankListDisplay {
-  vertical-align: top;
-  height: 60vh;
+  grid-row: content;
   overflow-y: scroll;
 }
 
 .SongSetListDisplay {
-  height: 30vh;
-}
-
-.LeftSideBar {
-  grid-column:left
+  grid-row: selectionList;
 }
 
 
-.RightSideBar {
-  grid-column: right
-}
 
 .box {
   margin: 5px;
@@ -55,4 +43,15 @@ ul.nav {
 
 ul.nav li { 
   display: inline-block;
+}
+
+.SongKeys {
+  display: grid;
+  grid-template-columns: [left] auto [center] auto [right] auto;
+  grid-template-rows: [header] 100px;
+}
+
+.SongKey {
+  grid-row: header;
+  text-align:  center;
 }

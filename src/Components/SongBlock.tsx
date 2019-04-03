@@ -12,7 +12,7 @@ const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
     const singleSong = (
     <div>
         <h2 key={song.Title}>{song.Title}</h2>
-        <div style={displayStyle}>
+        <div>
         <p>CCLI: {song.CCLINumber}</p>
         <p>Links:</p>
         <ul>
@@ -22,10 +22,19 @@ const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
             )}
         </ul>
         </div>
-        <div style={displayStyle}>
+        <div className="SongKeys">
+        <h3>Lyrics</h3>
+        {
+            song.Verses.map((Verse) => 
+            <div className="SongKey" >
+                {Verse}
+            </div>
+            )}
+        </div>
+        <div className="SongKeys">
         {
             song.SongKeys.map((SongKey) => 
-            <div>
+            <div className="SongKey" >
                 <h3>Song Key: {SongKey.Key}</h3>
                 Preferred by:
                 <ul> 
