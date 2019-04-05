@@ -24,11 +24,10 @@ const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
         </div>
         <div className="Verses">
         <h3>Lyrics</h3>
-            <div className="VersesList">
+            <div className="VersesListScrollingWrapper">
             {
                 song.Verses.map((Verse) => 
-                <div className="Verse box" >
-                    {Verse}
+                <div className="VerseCard" ><p>{Verse}</p>
                 </div>
                 )}
             </div>

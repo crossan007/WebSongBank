@@ -12,6 +12,7 @@
 
 
 .CurrentSongDisplay {
+  overflow: hidden;
   grid-column: right;
   grid-row: selectionList / span 2;
 }
@@ -27,18 +28,23 @@
 }
 
 
-.Verses {
 
-}
-.VersesList {
-  overflow-x: scroll;
+.VersesListScrollingWrapper {
   height: 30vh;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 
-.Verse {
+.VerseCard {
   display:inline-block;
   width: 20vw;
-  height: 30vh;
+  margin: 5px;
+  border: 1px solid black;
+  padding: 5px;
+  height: 25vh;
+  vertical-align: top;
+  white-space: initial;
 }
 
  
