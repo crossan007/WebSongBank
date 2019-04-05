@@ -13,9 +13,11 @@
 
 
 .CurrentSongDisplay {
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
   grid-column: right;
   grid-row: selectionList / span 2;
+  max-height: calc(100vh - 150px)
 }
 
 .SongBankListDisplay {
@@ -49,6 +51,12 @@
   overflow: hidden;
 }
 
+.songbox{ 
+  margin: 5px;
+  border: 1px solid black;
+  padding: 5px;
+
+}
  
 .box {
   margin: 5px;

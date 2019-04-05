@@ -32,7 +32,7 @@ const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
     
 
     const singleSong = (
-    <div>
+    <div className="songbox">
         <h2 key={song.Title}>{song.Title}</h2>
         <div>
         <p>CCLI: {song.CCLINumber}</p>

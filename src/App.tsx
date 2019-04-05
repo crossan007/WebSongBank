@@ -65,7 +65,7 @@ class App extends React.Component<WebSongBankProps>{
             { songList }
         </div>
 
-        <div className ="CurrentSongDisplay box">
+        <div className ="CurrentSongDisplay">
           <Route path="/:id" render={(props)=>{
             if (Songs.length >0 && Songs[props.match.params.id] != undefined){ 
               return <SongBlock song={Songs[props.match.params.id]} />
