@@ -1,14 +1,36 @@
-import React, { Component } from 'react';
+import React, { Component, ReactElement } from 'react';
 import Song from "../Interfaces/Song";
+import SongKey from '../Interfaces/SongKey';
 
 const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
     
-    console.log(song);
+    
     
     if (song === undefined) {
     return <div></div>;
     }
     const displayStyle = {display: 'inline-block'};
+    
+    function getSongKeyLinks(SongKey: SongKey) : ReactElement{
+        console.log("LINKS");
+       console.log(SongKey.Links);
+        if (SongKey.Links.length > 0 ) {
+            return (
+                <div>
+                Key Links:
+                <ul>
+                {
+                    SongKey.Links.map((link) => 
+                    <li><a href={link.URL}>{link.Title}</a></li>
+                    )}
+                </ul>
+                </div>
+            );
+        }
+        return;
+    }
+    
+
     const singleSong = (
     <div>
         <h2 key={song.Title}>{song.Title}</h2>
@@ -33,26 +55,23 @@ const SongBlock: React.FunctionComponent<{song:Song}> = ({song}) => {
             </div>
         </div>
         <div className="SongKeys">
-        {
-            song.SongKeys.map((SongKey) => 
-            <div className="SongKey" >
-                <h3>Song Key: {SongKey.Key}</h3>
-                Preferred by:
-                <ul> 
-                {
-                SongKey.PreferredBy.map((PreferredBy) => 
-                <li>{PreferredBy}</li>
-                )}
-                </ul>
-                Key Links:
-                <ul>
-                {
-                    SongKey.Links.map((link) => 
-                    <li><a href="{link.URL}">{link.Title}</a></li>
+            <h3>Song Keys</h3>
+            <div className="VersesListScrollingWrapper">
+                {song.SongKeys.map((SongKey) => 
+                <div className="VerseCard" >
+                    <h3>Song Key: {SongKey.Key}</h3>
+                    Preferred by:
+                    <ul> 
+                    {
+                    SongKey.PreferredBy.map((PreferredBy) => 
+                    <li>{PreferredBy}</li>
                     )}
-                </ul>
+                    </ul>
+                    {getSongKeyLinks(SongKey)}
+                   
+                </div>
+                )}
             </div>
-            )}
         </div>
     </div>
     );

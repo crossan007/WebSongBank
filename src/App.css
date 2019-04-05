@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: [left] 30vw [right] auto;
   grid-template-rows: [header] 100px [selectionList] 25vh [content] min-content;
+  overflow: hidden;
 }
 
 .Header {
@@ -12,7 +13,7 @@
 
 
 .CurrentSongDisplay {
-  overflow: hidden;
+  overflow: scroll;
   grid-column: right;
   grid-row: selectionList / span 2;
 }
@@ -30,7 +31,7 @@
 
 
 .VersesListScrollingWrapper {
-  height: 30vh;
+  min-height: 30vh;
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
@@ -38,13 +39,14 @@
 
 .VerseCard {
   display:inline-block;
-  width: 20vw;
+  width: 120pt;
   margin: 5px;
   border: 1px solid black;
   padding: 5px;
-  height: 25vh;
+  min-height: 25vh;
   vertical-align: top;
   white-space: initial;
+  overflow: hidden;
 }
 
  
@@ -65,15 +67,4 @@ ul.nav {
 
 ul.nav li { 
   display: inline-block;
-}
-
-.SongKeys {
-  display: grid;
-  grid-template-columns: [left] auto [center] auto [right] auto;
-  grid-template-rows: [header] 100px;
-}
-
-.SongKey {
-  grid-row: header;
-  text-align:  center;
 }
