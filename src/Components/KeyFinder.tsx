@@ -1,18 +1,30 @@
 import React, { Component } from 'react';
 
+interface KeyFinderProps {
+    currentNote: string, 
+    notesList:string[]
+}
 
-const KeyFinder: React.FunctionComponent<{currentNote: string, notesList:string[]}> = () => {
+class KeyFinder extends React.Component<KeyFinderProps> {
 
-    // The WebAudio API types are *interesting* to discover in TypeScript.  this helps: https://stackoverflow.com/questions/32797833/typescript-web-audio-api-missing-definitions
-    var isPlaying: boolean= false;
-    var audioContext: AudioContext = null;
-    var sourceNode: AudioBufferSourceNode;
-    var analyser: AnalyserNode;
-    var buflen = 1024;
-    var buf = new Float32Array( buflen );
-    var rafID: number;
-    
-    function autoCorrelate( buf: Float32Array, sampleRate: number ) {
+        // The WebAudio API types are *interesting* to discover in TypeScript.  this helps: https://stackoverflow.com/questions/32797833/typescript-web-audio-api-missing-definitions
+
+    noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    audioContext: AudioContext
+    isPlaying: boolean
+    analyser?: AnalyserNode
+    rafID?: number
+    buflen: number
+    buf?: Float32Array
+    currentNote: string
+
+    constructor(props: KeyFinderProps) {
+        super(props);
+        this.audioContext = new AudioContext();
+        this.buf = new Float32Array( this.buflen );
+    }
+
+    autoCorrelate = (buf: Float32Array, sampleRate: number ) => {
         var MIN_SAMPLES = 0; 
         var GOOD_ENOUGH_CORRELATION = 0.9;
         var SIZE = buf.length;
@@ -69,17 +81,15 @@ const KeyFinder: React.FunctionComponent<{currentNote: string, notesList:string[
     //	var best_frequency = sampleRate/best_offset;
     }
 
-    var noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-    function noteFromPitch( frequency: number) {
+    noteFromPitch = ( frequency: number) => {
         var noteNum = 12 * (Math.log( frequency / 440 )/Math.log(2) );
         return Math.round( noteNum ) + 69;
     }
 
-    function updatePitch( ) {
+    updatePitch  = () => {
         var cycles = new Array;
-        analyser.getFloatTimeDomainData( buf );
-        var ac = autoCorrelate( buf, audioContext.sampleRate );
+        this.analyser.getFloatTimeDomainData( this.buf );
+        var ac = this.autoCorrelate( this.buf, this.audioContext.sampleRate );
     
          if (ac == -1) {
             //detectorElem.className = "vague";
@@ -88,27 +98,27 @@ const KeyFinder: React.FunctionComponent<{currentNote: string, notesList:string[
              //detectorElem.className = "confident";
              var pitch = ac;
            
-             var note =  noteFromPitch( pitch );
-             console.log(noteStrings[note%12]);
+             var note =  this.noteFromPitch( pitch );
+             console.log(this.noteStrings[note%12]);
         }
     
         if (!window.requestAnimationFrame)
             window.requestAnimationFrame = window.webkitRequestAnimationFrame;
-        rafID = window.requestAnimationFrame( updatePitch );
+        this.rafID = window.requestAnimationFrame( this.updatePitch );
     }
 
-    function gotStream(stream: MediaStream ) {
+    gotStream = (stream: MediaStream )  => {
         // Create an AudioNode from the stream.
-        var mediaStreamSource = audioContext.createMediaStreamSource(stream);
+        var mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
     
         // Connect it to the destination.
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        mediaStreamSource.connect( analyser );
-        updatePitch();
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 2048;
+        mediaStreamSource.connect( this.analyser );
+        this.updatePitch();
     }
 
-    function getUserMedia(dictionary: any, callback: (stream:any) => void ){
+    getUserMedia = (dictionary: any, callback: (stream:any) => void ) => {
         try {
             navigator.getUserMedia(dictionary, callback, () =>  {alert('Stream generation failed.');});
         } catch (e) {
@@ -116,19 +126,17 @@ const KeyFinder: React.FunctionComponent<{currentNote: string, notesList:string[
         }
     }
 
-    function toggleLiveInput() {
-        audioContext = new AudioContext();
-        if (isPlaying) {
+    toggleLiveInput = () => {
+        this.audioContext = new AudioContext();
+        if (this.isPlaying) {
             //stop playing and return
-            sourceNode.stop( 0 );
-            sourceNode = null;
-            analyser = null;
-            isPlaying = false;
+            this.analyser = null;
+            this.isPlaying = false;
             if (!window.cancelAnimationFrame)
                 window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-            window.cancelAnimationFrame( rafID );
+            window.cancelAnimationFrame( this.rafID );
         }
-        getUserMedia(
+        this.getUserMedia(
             {
                 "audio": {
                     "mandatory": {
@@ -139,26 +147,27 @@ const KeyFinder: React.FunctionComponent<{currentNote: string, notesList:string[
                     },
                     "optional": []
                 },
-            }, gotStream);
+            }, this.gotStream);
     }
     
 
-    function startListening(){
-        toggleLiveInput();
+    startListening = () => {
+        this.toggleLiveInput();
     }
 
-    const keyFinder = (
-        <h1>Key Finder<button onClick={() => startListening()} >Start Listening</button>
-        <button >Capture Current Note</button>
-        <button >Clear captured note</button>
-        <span id="currentNote"/>
-        <ul>
+    render() {
+        return (
+            <h1>Key Finder<button onClick={() => this.startListening()} >Start Listening</button>
+            <button >Capture Current Note</button>
+            <button >Clear captured note</button>
+            <span id="currentNote">Note: {this.currentNote}</span>
+            <ul>
 
-        </ul>
-        </h1>
-    );
+            </ul>
+            </h1>
+        );
+    }
 
-    return keyFinder;
 }
 
 
