@@ -14,6 +14,7 @@ import * as songActions from "./redux/actions/songActions";
 import { connect } from "react-redux";
 
 import AppState from "./Interfaces/AppState";
+import KeyFinder from './Components/KeyFinder';
 
 interface WebSongBankProps {
   actions: any
@@ -51,13 +52,15 @@ class App extends React.Component<WebSongBankProps>{
     )
 
     return (
-      <div className="App">
+      <div className="App"> 
         <div className="Header">
           <h1>Song Bank</h1>
         </div>
        
         <div className="SongSetListDisplay box">
-          <SongSetBlock SongSets={SongSets}/>
+        {/*<SongSetBlock SongSets={SongSets}/>*/}
+        <KeyFinder currentNote="A" notesList={["a","b"]} />
+
         
         </div>
         <div className="SongBankListDisplay box">
