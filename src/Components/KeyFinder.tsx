@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { KMeans } from 'machinelearn/cluster';
 import {KNeighborsClassifier} from 'machinelearn/neighbors';
+import { number } from 'prop-types';
 
 interface KeyFinderProps {
     notesList?:string[]
@@ -173,6 +174,17 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
         });
     }
 
+    notesToArray(incomingArray: string[]) { 
+        let returnArray:number[] = new Array(12);
+        returnArray.fill(0,0,12)
+        this.noteStrings.map((note,index) => { 
+            if (incomingArray.includes(note)){
+                returnArray[index]=1
+            }
+        } ) 
+        return returnArray;
+    }
+
 
     predict_key() {
          // create a new KMeans instance with 15 clusters;  one cluster for each possible key signature
@@ -182,32 +194,29 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
         const KM2 = new KNeighborsClassifier();
 
         // we need an array of 12 keys - one for each key signatiure
-        // each array will contain 12 (1) or (0) in the index representing 
+        // each member array will contain 12 values (1) or (0) 
+        // in the index representing 
         // the presence or absence of the note in the key
         //  [C, C#,D, D#,E ,F ,F#,G ,G#,A ,A#,B]
         const KeySignatures = [
             // key of C
-            [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1],
+            this.notesToArray(["C", "D", "E", "F", "G", "A", "B"]),
             // key of C#
-            [1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0],
+            this.notesToArray(["C#", "D#", "F", "F#", "G#", "A", "A"]),
             // key of D
-            [0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1]
+            this.notesToArray(["D", "E", "F#", "G", "A", "B", "C#"])
         ];
         const TrainingKeys = [
             "C",
             "C#",
             "D"
         ]
-        
+        console.log(KeySignatures);
         KM2.fit(KeySignatures ,TrainingKeys);
-
         // I would expecte this to yeild "D"
-        const incoming = 
-            [0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1];
-
-        
+        const incoming = this.notesToArray(["C#", "D#", "F", "F#", "G#", "A", "A"]);
+        console.log(incoming);
         console.log(KM2.predict(incoming));
-
     }
 
 
