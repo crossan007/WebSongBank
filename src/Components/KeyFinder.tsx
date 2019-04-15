@@ -1,13 +1,19 @@
 import React, { Component } from 'react';
+import { KMeans } from 'machinelearn/cluster';
+import {KNeighborsClassifier} from 'machinelearn/neighbors';
 
 interface KeyFinderProps {
+    notesList?:string[]
+}
+
+interface KeyFinderState {
     currentNote: string, 
     notesList:string[]
 }
 
-class KeyFinder extends React.Component<KeyFinderProps> {
+class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
 
-        // The WebAudio API types are *interesting* to discover in TypeScript.  this helps: https://stackoverflow.com/questions/32797833/typescript-web-audio-api-missing-definitions
+    // The WebAudio API types are *interesting* to discover in TypeScript.  this helps: https://stackoverflow.com/questions/32797833/typescript-web-audio-api-missing-definitions
 
     noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     audioContext: AudioContext
@@ -16,12 +22,16 @@ class KeyFinder extends React.Component<KeyFinderProps> {
     rafID?: number
     buflen: number
     buf?: Float32Array
-    currentNote: string
 
     constructor(props: KeyFinderProps) {
         super(props);
         this.audioContext = new AudioContext();
+        this.buflen = 1024; 
         this.buf = new Float32Array( this.buflen );
+        this.state = {
+            currentNote: "",
+            notesList: [""]
+        }
     }
 
     autoCorrelate = (buf: Float32Array, sampleRate: number ) => {
@@ -29,6 +39,7 @@ class KeyFinder extends React.Component<KeyFinderProps> {
         var GOOD_ENOUGH_CORRELATION = 0.9;
         var SIZE = buf.length;
         var MAX_SAMPLES = Math.floor(SIZE/2);
+        console.log("size: " + SIZE);
         var best_offset = -1;
         var best_correlation = 0;
         var rms = 0;
@@ -93,13 +104,13 @@ class KeyFinder extends React.Component<KeyFinderProps> {
     
          if (ac == -1) {
             //detectorElem.className = "vague";
+            this.setState({currentNote:"?"})
            
          } else {
              //detectorElem.className = "confident";
              var pitch = ac;
-           
              var note =  this.noteFromPitch( pitch );
-             console.log(this.noteStrings[note%12]);
+             this.setState({currentNote: this.noteStrings[note%12]})
         }
     
         if (!window.requestAnimationFrame)
@@ -155,16 +166,66 @@ class KeyFinder extends React.Component<KeyFinderProps> {
         this.toggleLiveInput();
     }
 
-    render() {
-        return (
-            <h1>Key Finder<button onClick={() => this.startListening()} >Start Listening</button>
-            <button >Capture Current Note</button>
-            <button >Clear captured note</button>
-            <span id="currentNote">Note: {this.currentNote}</span>
-            <ul>
+    captureCurrentNote = () => {
+        var joined = this.state.notesList.concat(this.state.currentNote);
+        this.setState({ 
+            notesList: joined
+        });
+    }
 
+
+    predict_key() {
+         // create a new KMeans instance with 15 clusters;  one cluster for each possible key signature
+         // this is a supervised learning scenario
+         // there are 15 keys to learn, and incoming data will be classified into one of the 15 keys
+         // docs: https://www.machinelearnjs.com/api/neighbors.KNeighborsClassifier.html
+        const KM2 = new KNeighborsClassifier();
+
+        // we need an array of 12 keys - one for each key signatiure
+        // each array will contain 12 (1) or (0) in the index representing 
+        // the presence or absence of the note in the key
+        //  [C, C#,D, D#,E ,F ,F#,G ,G#,A ,A#,B]
+        const KeySignatures = [
+            // key of C
+            [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1],
+            // key of C#
+            [1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0],
+            // key of D
+            [0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1]
+        ];
+        const TrainingKeys = [
+            "C",
+            "C#",
+            "D"
+        ]
+        
+        KM2.fit(KeySignatures ,TrainingKeys);
+
+        // I would expecte this to yeild "D"
+        const incoming = 
+            [0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1];
+
+        
+        console.log(KM2.predict(incoming));
+
+    }
+
+
+    render() {
+        this.predict_key();
+        return (
+        <div>
+            <h1>Key Finder</h1><button onClick={() => this.startListening()} >Start Listening</button>
+            <button onClick={() => this.captureCurrentNote()}>Capture Current Note</button>
+            <button >Clear captured note</button>
+            <span id="currentNote">Current Note: {this.state.currentNote}</span>
+            <ul className = "notesList">
+                {
+                this.state.notesList.map((note) => 
+                <li>{note}</li>
+                )}
             </ul>
-            </h1>
+        </div>
         );
     }
 

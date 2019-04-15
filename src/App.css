@@ -76,3 +76,16 @@ ul.nav {
 ul.nav li { 
   display: inline-block;
 }
+
+
+.notesList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.notesList li {
+  float: left;
+  margin-left: 5px;
+}

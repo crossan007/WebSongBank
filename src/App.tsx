@@ -59,7 +59,8 @@ class App extends React.Component<WebSongBankProps>{
        
         <div className="SongSetListDisplay box">
         {/*<SongSetBlock SongSets={SongSets}/>*/}
-        <KeyFinder currentNote="A" notesList={["a","b"]} />
+        <Link to="/keyfinder"  >Open Keyfinder</Link>
+        
 
         
         </div>
@@ -70,13 +71,17 @@ class App extends React.Component<WebSongBankProps>{
 
         <div className ="CurrentSongDisplay">
           <Route path="/:id" render={(props)=>{
-            if (Songs.length >0 && Songs[props.match.params.id] != undefined){ 
+            if (Songs.length && Songs[props.match.params.id] != undefined) { 
               return <SongBlock song={Songs[props.match.params.id]} />
-              }
-              else {
+            }
+            else {
               return <h1>Loading</h1>
-              }
+            }
           }}/>
+          <Route path="/keyfinder" render={(props) => {
+               return <KeyFinder />
+          }}/>
+
         </div>
 
       </div>
