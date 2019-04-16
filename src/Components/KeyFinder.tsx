@@ -9,6 +9,8 @@ interface KeyFinderProps {
 
 interface KeyFinderState {
     currentNote: string, 
+    centsOff: number,
+    detuneDirection: string,
     notesList:string[]
 }
 
@@ -27,11 +29,14 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
     constructor(props: KeyFinderProps) {
         super(props);
         this.audioContext = new AudioContext();
-        this.buflen = 1024; 
+        this.buflen = 4096; 
         this.buf = new Float32Array( this.buflen );
         this.state = {
             currentNote: "",
+            centsOff: 0,
+            detuneDirection: "",
             notesList: [""]
+
         }
     }
 
@@ -40,7 +45,6 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
         var GOOD_ENOUGH_CORRELATION = 0.9;
         var SIZE = buf.length;
         var MAX_SAMPLES = Math.floor(SIZE/2);
-        console.log("size: " + SIZE);
         var best_offset = -1;
         var best_correlation = 0;
         var rms = 0;
@@ -93,10 +97,19 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
     //	var best_frequency = sampleRate/best_offset;
     }
 
-    noteFromPitch = ( frequency: number) => {
+    noteFromPitch = ( frequency: number) : number=> {
         var noteNum = 12 * (Math.log( frequency / 440 )/Math.log(2) );
         return Math.round( noteNum ) + 69;
     }
+
+    frequencyFromNoteNumber = ( note:number ) : number=> {
+        return 440 * Math.pow(2,(note-69)/12);
+    }
+
+    centsOffFromPitch = ( frequency: number, note:number ) : number => {
+        return Math.floor( 1200 * Math.log( frequency / this.frequencyFromNoteNumber( note ))/Math.log(2) );
+    }
+    
 
     updatePitch  = () => {
         var cycles = new Array;
@@ -111,7 +124,13 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
              //detectorElem.className = "confident";
              var pitch = ac;
              var note =  this.noteFromPitch( pitch );
-             this.setState({currentNote: this.noteStrings[note%12]})
+             var detune = this.centsOffFromPitch( pitch, note );
+             this.setState(
+                 {
+                     currentNote: this.noteStrings[note%12],
+                     centsOff: detune,
+                     detuneDirection: (detune < 0 ? "flat": "sharp")
+                })
         }
     
         if (!window.requestAnimationFrame)
@@ -186,48 +205,96 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
     }
 
 
-    predict_key() {
-         // create a new KMeans instance with 15 clusters;  one cluster for each possible key signature
-         // this is a supervised learning scenario
-         // there are 15 keys to learn, and incoming data will be classified into one of the 15 keys
-         // docs: https://www.machinelearnjs.com/api/neighbors.KNeighborsClassifier.html
-        const KM2 = new KNeighborsClassifier();
-
+    predict_key(Notes: string[]) {
         // we need an array of 12 keys - one for each key signatiure
         // each member array will contain 12 values (1) or (0) 
         // in the index representing 
         // the presence or absence of the note in the key
+        // scales pulled from https://www.pianoscales.org/major.html
         //  [C, C#,D, D#,E ,F ,F#,G ,G#,A ,A#,B]
         const KeySignatures = [
             // key of C
             this.notesToArray(["C", "D", "E", "F", "G", "A", "B"]),
-            // key of C#
-            this.notesToArray(["C#", "D#", "F", "F#", "G#", "A", "A"]),
             // key of D
-            this.notesToArray(["D", "E", "F#", "G", "A", "B", "C#"])
+            this.notesToArray(["D", "E", "F#", "G", "A", "B", "C#"]),
+            // key of E
+            this.notesToArray(["E"," F#"," G#"," A"," B"," C#"," D#"]),
+            // key of F
+            this.notesToArray(["F"," G"," A"," Bb"," C"," D", "E"]),
+            /// Key of G
+            this.notesToArray(["G","A","B","C","D","E", "F#"]),
+            // A
+            this.notesToArray(["A","B","C#","D","E"," F#"," G#", "A" ]),
+            // B
+            this.notesToArray(["B","C#","D#","E","F#","G#","A#", "B"]),
+            // c#
+            this.notesToArray(["Db","Eb","F","Gb","Ab","Bb","C", "Db"]),
+            // d#
+            this.notesToArray(["Eb","F","G","Ab","Bb","C","D", "Eb"]),
+            // F#
+            this.notesToArray(["F#","G#","A#","B","C#","D#","F", "F#"]),
+            // G#
+            this.notesToArray(["Ab","Bb","C","Db","Eb","F","G", "Ab"]),
+            //A#
+            this.notesToArray(["Bb","C","D","Eb","F","G","A", "Bb"])
+
+
         ];
         const TrainingKeys = [
             "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "A",
+            "B",
             "C#",
-            "D"
+            "D#",
+            "F#",
+            "G#",
+            "A#"
+
         ]
-        console.log(KeySignatures);
-        KM2.fit(KeySignatures ,TrainingKeys);
-        // I would expecte this to yeild "D"
-        const incoming = this.notesToArray(["C#", "D#", "F", "F#", "G#", "A", "A"]);
-        console.log(incoming);
-        console.log(KM2.predict(incoming));
+    
+        const incoming = this.notesToArray(Notes);//["D", "E", "F#", "G", "A", "B", "C#"]);
+        let keyMatches:number[] = new Array(12);
+        keyMatches.fill(0,0,12)
+        
+        KeySignatures.map((keySignature,ksindex) => {
+            keySignature.map((note,keynoteindex) => {
+                keyMatches[ksindex] += note * incoming[keynoteindex];
+            });
+        })
+        if (Math.max(...keyMatches) >3 ) {
+            console.log(keyMatches);
+            var ksMatch = this.noteStrings[keyMatches.indexOf(Math.max(...keyMatches))];
+            console.log(ksMatch);
+            return ksMatch;
+        }
+        return "";
     }
 
+    clearNotes = () => {
+        var joined = new Array();
+        this.setState({ 
+            notesList: joined
+        });
+    }
 
     render() {
-        this.predict_key();
+        
         return (
         <div>
             <h1>Key Finder</h1><button onClick={() => this.startListening()} >Start Listening</button>
             <button onClick={() => this.captureCurrentNote()}>Capture Current Note</button>
-            <button >Clear captured note</button>
-            <span id="currentNote">Current Note: {this.state.currentNote}</span>
+            <button onClick={() => this.clearNotes()}>Clear captured note</button>
+            <br/>
+            <span id="">Current Note: {this.state.currentNote}</span><br/>
+            <span id="">Detune Direction: {this.state.detuneDirection}</span><br/>
+            <span id="">Cents off: {this.state.centsOff}</span><br/>
+            <span id="">Current predicted key: {this.predict_key(this.state.notesList)}</span>
+            <br/>
+            <span>Captured notes:</span>
             <ul className = "notesList">
                 {
                 this.state.notesList.map((note) => 
