@@ -89,3 +89,16 @@ ul.nav li {
   float: left;
   margin-left: 5px;
 }
+
+#detuneVisualBox {
+  display:block;
+  width: 100px;
+  border: 1px solid black;
+  margin: 10px;
+  padding: 5px 0px 5px 0px;
+}
+
+#detuneVisualMarker {
+  position: relative;
+  vertical-align: top;
+}

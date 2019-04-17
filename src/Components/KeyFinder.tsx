@@ -8,6 +8,7 @@ interface KeyFinderProps {
 }
 
 interface KeyFinderState {
+    pitch: number,
     currentNote: string, 
     centsOff: number,
     detuneDirection: string,
@@ -25,13 +26,16 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
     rafID?: number
     buflen: number
     buf?: Float32Array
+    previousPitches: Float32Array
+    previousPitchSequence: number
 
     constructor(props: KeyFinderProps) {
         super(props);
         this.audioContext = new AudioContext();
-        this.buflen = 4096; 
+        this.buflen = 256; 
         this.buf = new Float32Array( this.buflen );
         this.state = {
+            pitch: 0,
             currentNote: "",
             centsOff: 0,
             detuneDirection: "",
@@ -40,9 +44,9 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
         }
     }
 
-    autoCorrelate = (buf: Float32Array, sampleRate: number ) => {
+    FrequencyFromBuffer = (buf: Float32Array, sampleRate: number ) => {
         var MIN_SAMPLES = 0; 
-        var GOOD_ENOUGH_CORRELATION = 0.9;
+        var GOOD_ENOUGH_CORRELATION = 0.99;
         var SIZE = buf.length;
         var MAX_SAMPLES = Math.floor(SIZE/2);
         var best_offset = -1;
@@ -85,12 +89,13 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
                 // since foundGoodCorrelation cannot go to true until the second pass (offset=1), and 
                 // we can't drop into this clause until the following pass (else if).
                 var shift = (correlations[best_offset+1] - correlations[best_offset-1])/correlations[best_offset];  
+                console.log("f1 = " + sampleRate/(best_offset+(8*shift)) + "Hz (rms: " + rms + " confidence: " + best_correlation + ")")
                 return sampleRate/(best_offset+(8*shift));
             }
             lastCorrelation = correlation;
         }
         if (best_correlation > 0.01) {
-            // console.log("f = " + sampleRate/best_offset + "Hz (rms: " + rms + " confidence: " + best_correlation + ")")
+            console.log("f2 = " + sampleRate/best_offset + "Hz (rms: " + rms + " confidence: " + best_correlation + ")")
             return sampleRate/best_offset;
         }
         return -1;
@@ -109,12 +114,32 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
     centsOffFromPitch = ( frequency: number, note:number ) : number => {
         return Math.floor( 1200 * Math.log( frequency / this.frequencyFromNoteNumber( note ))/Math.log(2) );
     }
+
+    getSmoothedPitch  = (newPitch:number) => {
+        var smoothingBufferLength = 20
+        if (this.previousPitches == undefined || newPitch == -1) {
+            this.previousPitches = new Float32Array(smoothingBufferLength);
+            this.previousPitchSequence = 0;
+        }
+        if (newPitch == -1)
+        {
+            return -1;
+        }
+        this.previousPitches[this.previousPitchSequence%smoothingBufferLength] = newPitch
+        this.previousPitchSequence ++;
+        var averagePitch = 0;
+        for (var i=0;i<smoothingBufferLength;i++) {
+            averagePitch+=this.previousPitches[i];
+        }
+        return averagePitch/smoothingBufferLength;
+
+    }
     
 
     updatePitch  = () => {
         var cycles = new Array;
         this.analyser.getFloatTimeDomainData( this.buf );
-        var ac = this.autoCorrelate( this.buf, this.audioContext.sampleRate );
+        var ac = this.getSmoothedPitch(this.FrequencyFromBuffer( this.buf, this.audioContext.sampleRate ));
     
          if (ac == -1) {
             //detectorElem.className = "vague";
@@ -127,6 +152,7 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
              var detune = this.centsOffFromPitch( pitch, note );
              this.setState(
                  {
+                     pitch: pitch,
                      currentNote: this.noteStrings[note%12],
                      centsOff: detune,
                      detuneDirection: (detune < 0 ? "flat": "sharp")
@@ -211,6 +237,7 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
         // in the index representing 
         // the presence or absence of the note in the key
         // scales pulled from https://www.pianoscales.org/major.html
+        // https://www.studybass.com/lessons/harmony/keys-in-music/
         //  [C, C#,D, D#,E ,F ,F#,G ,G#,A ,A#,B]
         const KeySignatures = [
             // key of C
@@ -289,9 +316,13 @@ class KeyFinder extends React.Component<KeyFinderProps,KeyFinderState> {
             <button onClick={() => this.captureCurrentNote()}>Capture Current Note</button>
             <button onClick={() => this.clearNotes()}>Clear captured note</button>
             <br/>
+            <span id="">Current pitch: {this.state.pitch}</span><br/>
             <span id="">Current Note: {this.state.currentNote}</span><br/>
             <span id="">Detune Direction: {this.state.detuneDirection}</span><br/>
             <span id="">Cents off: {this.state.centsOff}</span><br/>
+            <div id="detuneVisualBox">
+                <span id="detuneVisualMarker" style={{left:this.state.centsOff+50}}>|</span>
+            </div>
             <span id="">Current predicted key: {this.predict_key(this.state.notesList)}</span>
             <br/>
             <span>Captured notes:</span>
